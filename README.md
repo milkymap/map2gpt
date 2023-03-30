@@ -79,11 +79,11 @@ python -m map2gpt.main --transformer_model_name 'Sahajtomar/french_semantic' exp
 # Module usage 
 ```python
     # build index from wikipedia page url 
-    from map2gpt import GPTRunner 
+    from map2gpt.runner import GPTRunner 
     runner = GPTRunner(
         device='cpu',
-        cache_folder='transformers_cache', 
-        openai_api_key='sk-', 
+        cache_folder='/path/to/transformers_cache', 
+        openai_api_key='sk-XXXXXXXXXXXXXXXXXXXXXXXXXXX', 
         transformer_model_name='Sahajtomar/french_semantic', 
     )
     
