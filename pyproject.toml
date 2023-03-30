@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "map2gpt"
+version = "0.0.1"
+authors = [
+    {name= "Ibrahima BA", email= "ibrahima.elmokhtar@gmail.com"}
+]
+
+description = "A python package to index and search documents using GPT3"
+readme={file = "README.md", content-type = "text/markdown"} 
+keywords=[
+    "GPT3, gpt-index, llama-index, pdf2gpt, doc2gpt, wikipedia2gpt, semantic-search"
+]
+requires-python = ">=3.7"
+
+dependencies = [
+    "click",
+    "rich",
+    "wikipedia", 
+    "PyPDF2",
+    "sentence-transformers",
+    "tenacity",
+    "openai",
+    "tiktoken",
+    "protobuf",
+    "pydantic"
+]
+
+classifiers=[
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/milkymap/map2gpt"

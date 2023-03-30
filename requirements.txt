@@ -1,0 +1,10 @@
+click
+rich 
+wikipedia 
+PyPDF2 
+sentence-transformers
+tenacity
+openai
+tiktoken
+protobuf
+pydantic
