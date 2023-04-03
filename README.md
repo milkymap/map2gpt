@@ -37,69 +37,121 @@ Please ensure that the model you choose is compatible with the project requireme
 
 # CLI usage 
 
-## Build Index from PDF
+## set env vars 
+```bash
+    export OPENAI_API_KEY=sk- TRANSFORMERS_CACHE=/path/to/cache QDRANT_PERSISTENT_FOLDER=/path/to_persistent
+```
+
+## Build Index from PDF files
 To build an index from a PDF file, run the following command:
 
 ```bash
-export OPENAI_API_KEY=sk- TRANSFORMERS_CACHE=path2cache_folder; 
-python -m map2gpt.main --transformer_model_name 'Sahajtomar/french_semantic' build-index-from-pdf 
-    --path2pdf_file /path/to/file.pdf \
-    --path2extracted_features /path/to/features.pkl \
-    --name service_name \
-    --description service_description \  
-    --chunk_size 128 \
-    --batch_size 8
+python -m map2gpt.main --transformer_model_name 'Sahajtomar/french_semantic' build-index-from-pdf-files
+    --path2pdf_files /path/to/file-000.pdf \
+    --path2pdf_files /path/to/file-001.pdf \
+    --name qdrant_collection_name \
+    --chunk_size 256 \
+    --batch_size 128
 ```
 
-## Build Index from Wikipedia
+## Build Index from Wikipedia pages
 To build an index from a Wikipedia page, run the following command:
 
 ```bash
-export OPENAI_API_KEY=sk- TRANSFORMERS_CACHE=path2cache_folder; 
-python -m map2gpt.main --transformer_model_name 'Sahajtomar/french_semantic' build-index-from-wikipedia \
-    --wikipedia_url https://url/to/wikipedia_page \
-    --path2extracted_features /path/to/features.pkl \
-    --name service_name \
-    --description service_description \  
-    --chunk_size 128 \
-    --batch_size 8
+python -m map2gpt.main --transformer_model_name 'Sahajtomar/french_semantic' build-index-from-wikipedia-pages
+    --urls https://...wikipedia \
+    --urls https://...wikipedia \
+    --name qdrant_collection_name \
+    --chunk_size 256 \
+    --batch_size 128
 ```
 
-## Explore Index
-To explore the index, run the following command:
+## Build Index from Youtube links 
+To build an index from a Wikipedia page, run the following command:
 
 ```bash
-export OPENAI_API_KEY=sk- TRANSFORMERS_CACHE=path2cache_folder; 
-python -m map2gpt.main --transformer_model_name 'Sahajtomar/french_semantic' explore-index \
-    --path2extracted_features /path/to/features.pkl \
-    --top_k 11 \
-    --source_k 3 
+python -m map2gpt.main --transformer_model_name 'Sahajtomar/french_semantic' build-index-from-youtube-links
+    --urls https://...youtube \
+    --urls https://...youtube \
+    --name qdrant_collection_name \
+    --chunk_size 256 \
+    --batch_size 128
 ```
 
-# Module usage 
+## Build Index from texts
+To build an index from a Wikipedia page, run the following command:
+
+
+```bash
+python -m map2gpt.main --transformer_model_name 'Sahajtomar/french_semantic' build-index-from-wikipedia-pages
+    --path2directory /path/to/corpus_text_files
+    --name qdrant_collection_name \
+    --chunk_size 256 \
+    --batch_size 128
+```
+
+# Explore Index
+To explore the index, run the following command:
+
+
+## query the index
+
+```bash
+python -m map2gpt.main --transformer_model_name 'Sahajtomar/french_semantic' query-index
+    --query "...." \
+    --name qdrant_collection_name \ 
+    --top_k 7
+    --source_k 3
+    --description "service description"
+```
+
+## deploy on telegram 
+
+```bash
+python -m map2gpt.main --transformer_model_name 'Sahajtomar/french_semantic' deploy-on-telegram
+    --telegram_token XXXXXXXXX...XXXXXXXXXXX \
+    --name qdrant_collection_name \ 
+    --top_k 7
+    --source_k 3
+    --description "service description"
+```
+
+# Module usage  
 ```python
-    # build index from wikipedia page url 
-    from map2gpt.runner import GPTRunner 
-    runner = GPTRunner(
-        device='cpu',
-        cache_folder='/path/to/transformers_cache', 
-        openai_api_key='sk-XXXXXXXXXXXXXXXXXXXXXXXXXXX', 
-        transformer_model_name='Sahajtomar/french_semantic', 
-    )
+    # create qdrant client 
+    qdrant = QdrantClient(':memory:') # use path for persistence
     
-    extracted_features = runner.build_index_from_wikipedia(
-        name=name, 
-        chunk_size=chunk_size, 
-        batch_size=batch_size, 
-        description=description,
-        wikipedia_url=wikipedia_url
+    # initialize runner
+    runner = GPTRunner(
+        device='cuda:0',  # cpu
+        qdrant=qdrant,
+        tokenizer='gpt-3.5-turbo',
+        openai_api_key='sk-XXXXXXXXXXXXXXXXXXXXX',
+        transformers_cache='/path/to/transformers_cache',
+        transformer_model_name='Sahajtomar/french_semantic'  # use all-mpnet-case-v2 for english
     )
 
-    index_response = runner.query_index(
-        query='what is the Big Bang theory?',
-        top_k=7,  # context size 
-        source_k=3, # number of source_chunks to retrieve
-        extracted_features=extracted_features
-    )  
-    index_response # answer, questions, source_chunks
+    # build index from wikipedia pages
+    knowledge_base = runner.build_index_from_pdf_files(
+        path2pdf_files=[
+            'https://www.youtube.com/watch?v=tH-i_FeagJc',
+            'https://www.youtube.com/watch?v=tH-i_FeagJc',
+        ],
+        chunk_size=256,
+        batch_size=128,
+        name='collection_name',
+    )
+    
+    # create qdrant index
+    runner.create_qdrant_index(knowledge_base=knowledge_base)
+
+    # deploy on telegram
+    deploy_on_telegram(
+        telegram_token='XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX', 
+        runner=runner, 
+        name='collection_name', 
+        description="service name description", 
+        top_k=10, 
+        source_k=3
+    )
 ```

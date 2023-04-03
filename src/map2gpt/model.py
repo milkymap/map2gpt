@@ -4,7 +4,6 @@ from pydantic import BaseModel
 
 from typing import List 
 
-from numpy import ndarray
 from dataclasses import dataclass
 
 class Role(str, Enum):
@@ -16,14 +15,13 @@ class Message(BaseModel):
     role:Role
     content:str
 
-class IndexResponse(BaseModel):
-    answer:str 
-    questions:str 
-    source_chunks:List[str]
-
 @dataclass
 class ExtractedFeatures:
+    document_id:str 
     chunks:List[str]
-    embeddings:ndarray 
+    embeddings:List[List[float]]
     name:str
-    description:str
+
+class YouTubeTranscriotionLanguage(str, Enum):
+    EN:str='English'
+    FR:str='French'
