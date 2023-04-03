@@ -119,7 +119,7 @@ python -m map2gpt.main --transformer_model_name 'Sahajtomar/french_semantic' dep
 # Module usage  
 ```python
     # create qdrant client 
-    qdrant = QdrantClient(':memory:') # use path for persistence
+    qdrant = QdrantClient(':memory:') # use path for persistence QdrantClient(path=path2persistent_dir)
     
     # initialize runner
     runner = GPTRunner(
